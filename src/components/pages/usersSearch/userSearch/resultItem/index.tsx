@@ -7,12 +7,14 @@ interface IResultItem {
 }
 
 const ResultItem = ({ result, onResultClick }: IResultItem) => {
+  const token = process.env.REACT_APP_TOKEN
+
   const [userData, setUserData] = useState<any>(null);
   // console.log("userData", userData)
   useEffect(() => {
     async function handleSearch(id: string) {
       const octokit = new Octokit({
-        auth: "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",
+        auth: token,
       });
 
       const data = await octokit.request(`GET /users/${id}`, {

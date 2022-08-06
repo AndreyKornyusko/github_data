@@ -29,6 +29,8 @@ const SearchResults = ({ results, onResultClick, loading }: ISearchResults) => {
 };
 
 const UsersSearch = () => {
+  const token = process.env.REACT_APP_TOKEN
+
   const navigate = useNavigate();
   const [query, setQuery] = useState("");
   const [initialQuery, setInitialQuery] = useState("");
@@ -39,7 +41,7 @@ const UsersSearch = () => {
   useEffect(() => {
     async function handleSearch(query: string) {
       const octokit = new Octokit({
-        auth: "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",
+        auth: token,
       });
 
       try {

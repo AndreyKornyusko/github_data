@@ -29,11 +29,11 @@ const UserInfo = () => {
   console.log("userData", userData);
   console.log("userRepos", userRepos);
   console.log("filteredRepos", filteredRepos);
-
+  const token = process.env.REACT_APP_TOKEN
   useEffect(() => {
     async function handleSearch() {
       const octokit = new Octokit({
-        auth: "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",
+        auth: token,
       });
 
       const data = await octokit.request(`GET /users/${id}`, {
@@ -63,7 +63,7 @@ const UserInfo = () => {
   useEffect(() => {
     async function handleReposSearch() {
       const octokit = new Octokit({
-        auth: "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",
+        auth: token,
       });
 
       const data = await octokit.request(`GET /users/${id}/repos`, {
