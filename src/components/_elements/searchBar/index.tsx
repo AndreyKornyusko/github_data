@@ -3,8 +3,9 @@ import React, {useState, useEffect} from 'react'
 interface ISerchBar {
   onSearch: (input: string) => void;
   initialQuery: string;
+  placeholder:string
 }
-const SearchBar = ({ onSearch, initialQuery }: ISerchBar) => {
+const SearchBar = ({ onSearch, initialQuery, placeholder }: ISerchBar) => {
   const [query, setQuery] = useState(initialQuery);
 
   const handleChange = (input: string) => {
@@ -25,7 +26,7 @@ const SearchBar = ({ onSearch, initialQuery }: ISerchBar) => {
         <input
           name="search_field"
           autoComplete="off"
-          placeholder="Search for Users"
+          placeholder={placeholder}
           onChange={(e) => handleChange(e.target.value)}
           value={query}
           type="text"

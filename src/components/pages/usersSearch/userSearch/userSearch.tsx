@@ -3,19 +3,21 @@ import { useNavigate } from "react-router-dom";
 
 import SearchBar from "../../../_elements/searchBar";
 import ResultItem from "./resultItem";
+import storage from "../../../../services/localStorage";
 import styles from "./userSearch.module.scss";
+import { Item } from "src/interfaces/data.interface";
 const { Octokit } = require("@octokit/rest");
 
 interface ISearchResults {
-  results: any[];
-  onResultClick: (e: any, id: string) => void;
+  results: Item[];
+  onResultClick: (e: React.MouseEvent<HTMLElement>, id: string) => void;
   loading?: boolean;
 }
 
 const SearchResults = ({ results, onResultClick, loading }: ISearchResults) => {
   return (
     <div>
-      <ul role="list" >
+      <ul role="list">
         {results.map((result, index) => (
           <ResultItem
             key={index}
@@ -29,54 +31,43 @@ const SearchResults = ({ results, onResultClick, loading }: ISearchResults) => {
 };
 
 const UsersSearch = () => {
-  const token = process.env.REACT_APP_TOKEN
-
+  const token = process.env.REACT_APP_TOKEN;
+  const initialItems = storage.getUserItems();
   const navigate = useNavigate();
   const [query, setQuery] = useState("");
   const [initialQuery, setInitialQuery] = useState("");
-  const [searchPerformed, setSearchPerformed] = useState(false);
-  const [APIData, setAPIData] = useState([]);
-  console.log("APIData", APIData);
+  const [APIData, setAPIData] = useState(initialItems);
+  // console.log("APIData", APIData);
 
-  useEffect(() => {
-    async function handleSearch(query: string) {
-      const octokit = new Octokit({
-        auth: token,
+  async function handleResultsSearch(query: string) {
+    const octokit = new Octokit({
+      // auth: token,
+    });
+
+    try {
+      const data = await octokit.request(`GET /search/users`, {
+        q: query,
       });
-
-      try {
-        const data = await octokit.request(`GET /search/users`, {
-          q: query,
-        });
-        setAPIData(data.data.items);
-      } catch (err) {
-        console.log(err);
-      }
+      setAPIData(data.data.items);
+      storage.setUserItems(data.data.items);
+    } catch (err) {
+      console.log(err);
     }
-
-    if (query !== "") {
-      handleSearch(query);
-    }
-  }, [query]);
-
-  useEffect(() => {
-    if (query !== "") {
-      setSearchPerformed(true);
-    } else {
-      setSearchPerformed(false);
-    }
-  }, [query]);
+  }
 
   const handleSearch = (input: string) => {
     setQuery(input);
     setInitialQuery(input);
+    if (input) {
+      handleResultsSearch(input);
+    }
   };
 
-  const handleResultClick = (e: any, id: string) => {
+  const handleResultClick = (e: React.MouseEvent<HTMLElement>, id: string) => {
     e.preventDefault();
-    setInitialQuery("");
-    setQuery("");
-    setSearchPerformed(false);
+    // setInitialQuery("");
+    // setQuery("");
+    // setSearchPerformed(false);
     navigate(`/user/${id}`);
   };
 
@@ -86,10 +77,11 @@ const UsersSearch = () => {
       <SearchBar
         initialQuery={initialQuery}
         onSearch={(e) => handleSearch(e)}
+        placeholder="Search for users"
       />
-      {searchPerformed && (
+      {APIData?.length ? (
         <SearchResults results={APIData} onResultClick={handleResultClick} />
-      )}
+      ) : null}
     </div>
   );
 };

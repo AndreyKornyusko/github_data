@@ -2,10 +2,12 @@ import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import SearchBar from "../../../_elements/searchBar";
 import ResultItem from "../resultItem";
+import storage from "../../../../services/localStorage";
+import { UserData, UserRepo } from "src/interfaces/data.interface";
 const { Octokit } = require("@octokit/rest");
 
 interface ISearchResults {
-  results: any[];
+  results: UserRepo[];
 }
 const SearchResults = ({ results }: ISearchResults) => {
   return (
@@ -19,71 +21,88 @@ const SearchResults = ({ results }: ISearchResults) => {
   );
 };
 const UserInfo = () => {
+  const initialUserData = storage.getUserData();
+  const initialUserRepos = storage.getUsersRepos();
+  const cashedQuery = storage.getUsersReposQuery() || "";
+
   const { id } = useParams();
-  const [userData, setUserData] = useState<any>(null);
-  const [userRepos, setUserRepos] = useState<any[]>([]);
-  const [query, setQuery] = useState("");
-  const [initialQuery, setInitialQuery] = useState("");
-  const [searchPerformed, setSearchPerformed] = useState(false);
-  const [filteredRepos, setFilteredRepos] = useState<any[]>([]);
-  console.log("userData", userData);
-  console.log("userRepos", userRepos);
-  console.log("filteredRepos", filteredRepos);
-  const token = process.env.REACT_APP_TOKEN
+  const [isUserLoading, setIsUserLoading] = useState(true);
+  const [isReposLoading, setIsReposLoading] = useState(true);
+
+  const [userData, setUserData] = useState<UserData>(initialUserData);
+  const [userRepos, setUserRepos] = useState<UserRepo[]>([]);
+  const [query, setQuery] = useState(cashedQuery);
+  const [initialQuery, setInitialQuery] = useState(cashedQuery);
+  const [filteredRepos, setFilteredRepos] =
+    useState<UserRepo[]>(initialUserRepos);
+  // console.log("userData", userData);
+  // console.log("userRepos", userRepos);
+  // console.log("filteredRepos", filteredRepos);
+  const token = process.env.REACT_APP_TOKEN;
+  const date = new Date(userData?.created_at);
+  const dateMDY = `${date.getDate()}-${
+    date.getMonth() + 1
+  }-${date.getFullYear()}`;
   useEffect(() => {
-    async function handleSearch() {
+    async function getUser() {
       const octokit = new Octokit({
-        auth: token,
+        // auth: token,
       });
 
-      const data = await octokit.request(`GET /users/${id}`, {
-        username: id,
-      });
-      setUserData(data.data);
+      try {
+        const data = await octokit.request(`GET /users/${id}`, {
+          username: id,
+        });
+        storage.setUserData(data.data);
+        setUserData(data.data);
+        setIsUserLoading(false);
+      } catch (err) {
+        console.log(err);
+        storage.removeUserData();
+        setIsUserLoading(false);
+      }
     }
     if (id) {
-      handleSearch();
+      getUser();
     }
   }, []);
 
   useEffect(() => {
-    if (query !== "") {
-      setSearchPerformed(true);
-    } else {
-      setSearchPerformed(false);
-    }
-  }, [query]);
-
-  useEffect(() => {
-    if (query !== "") {
-      searchItems(query);
-    }
-  }, [query]);
-
-  useEffect(() => {
     async function handleReposSearch() {
       const octokit = new Octokit({
-        auth: token,
+        // auth: token,
       });
 
-      const data = await octokit.request(`GET /users/${id}/repos`, {
-        username: id,
-      });
-      setUserRepos(data.data);
+      try {
+        const data = await octokit.request(`GET /users/${id}/repos`, {
+          username: id,
+        });
+        setUserRepos(data.data);
+        storage.setUsersRepos(data.data);
+        setIsReposLoading(false);
+      } catch (err) {
+        console.log(err);
+        storage.removeUsersRepos();
+        storage.removeUsersReposQuery();
+        setIsReposLoading(false);
+      }
     }
     if (id) {
       handleReposSearch();
     }
   }, []);
 
-  const handleSearch = (input: string) => {
-    setQuery(input);
-    setInitialQuery(input);
-  };
+  useEffect(() => {
+    if (!query) {
+      storage.removeUsersReposQuery();
+      storage.removeUsersRepos();
+    }
+  }, [query]);
 
-  const searchItems = (searchValue: string) => {
+  const handleSearch = (searchValue: string) => {
     setQuery(searchValue);
     setInitialQuery(searchValue);
+    storage.setUsersReposQuery(searchValue);
 
     if (query !== "") {
       const filteredData = userRepos.filter((item) => {
@@ -93,32 +112,38 @@ const UserInfo = () => {
           .includes(query.toLowerCase());
       });
       setFilteredRepos(filteredData);
-    } else {
-      setFilteredRepos(userRepos);
     }
   };
 
   return (
     <div>
       <h1>Github Searcher</h1>
-      <div>
+      {isUserLoading||!userData ? (
+        <div>Loading...</div>
+      ) : (
         <div>
-          <img src={userData?.avatar_url} alt="user avatar" />
+          <div>
+            <div>
+              <img src={userData?.avatar_url} alt="user avatar" />
+            </div>
+            <div>
+              <div>User name {userData?.name}</div>
+              <div>Email {userData?.email}</div>
+              <div>Location {userData?.location}</div>
+              <div>Join Date {dateMDY ? dateMDY : ""}</div>
+              <div>Followers {userData?.followers}</div>
+              <div>Following {userData?.following}</div>
+            </div>
+          </div>
+          <div>{userData?.bio}</div>
         </div>
-        <div>
-          <div>User name {userData?.name}</div>
-          <div>Email {userData?.email}</div>
-          <div>Location {userData?.location}</div>
-          <div>Join Date {userData?.created_at}</div>
-          <div>Followers {userData?.followers}</div>
-          <div>Following {userData?.following}</div>
-        </div>
-      </div>
+      )}
       <SearchBar
         initialQuery={initialQuery}
         onSearch={(e) => handleSearch(e)}
+        placeholder="Search for user`s repositories"
       />
-      {searchPerformed && <SearchResults results={filteredRepos} />}
+      {filteredRepos?.length&&!isReposLoading ? <SearchResults results={filteredRepos} /> : null}
     </div>
   );
 };
