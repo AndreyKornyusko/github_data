@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import {Item, UserData} from 'src/interfaces/data.interface'
+import styles from './resultItem.module.scss'
 const { Octokit } = require("@octokit/rest");
 
 interface IResultItem {
@@ -30,11 +31,11 @@ const ResultItem = ({ result, onResultClick }: IResultItem) => {
   }, []);
 
   return (
-    <li>
-      <div onClick={(e) => onResultClick(e, result.login)}>
-        <img src={result.avatar_url} alt="user avatar" />
-        <div>{userData?.name}</div>
-        <div>Repo: {userData?.public_repos}</div>
+    <li className={styles.listItem}>
+      <div className={styles.resultItem} onClick={(e) => onResultClick(e, result.login)}>
+        <img className={styles.userAvatar} src={result.avatar_url} alt="user avatar" />
+        <div className={styles.userName}>{userData?.name}</div>
+        <div className={styles.userRepo}>Repo: <span>{userData?.public_repos}</span></div>
       </div>
     </li>
   );

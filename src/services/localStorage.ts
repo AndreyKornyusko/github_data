@@ -12,10 +12,16 @@ const StorageService = {
     }
   },
   setUsersReposQuery: function (query: string) {
-    if (query) {
+    if (query|| query==='') {
       localStorage.setItem("UsersReposQuery", JSON.stringify(query));
     }
   },
+  setUserReposQuery: function (query: string) {
+    if (query|| query==='') {
+      localStorage.setItem("UserReposQuery", JSON.stringify(query));
+    }
+  },
+
   setUsersRepos: function (query: string) {
     if (query) {
       localStorage.setItem("UsersRepos", JSON.stringify(query));
@@ -42,9 +48,17 @@ const StorageService = {
   getUsersReposQuery: function () {
     if (typeof window !== "undefined") {
       //@ts-ignore
-      const UsersReposQuery = JSON.parse(localStorage.getItem("UsersReposQuery")
-      );
+      const UsersReposQuery = JSON.parse(localStorage.getItem("UsersReposQuery"));
       return UsersReposQuery;
+    } else {
+      return {};
+    }
+  },
+  getUserReposQuery: function () {
+    if (typeof window !== "undefined") {
+      //@ts-ignore
+      const UserReposQuery = JSON.parse(localStorage.getItem("UserReposQuery"));
+      return UserReposQuery;
     } else {
       return {};
     }
@@ -52,8 +66,7 @@ const StorageService = {
   getUsersRepos: function () {
     if (typeof window !== "undefined") {
       //@ts-ignore
-      const UsersRepos = JSON.parse(localStorage.getItem("UsersRepos")
-      );
+      const UsersRepos = JSON.parse(localStorage.getItem("UsersRepos"));
       return UsersRepos;
     } else {
       return {};
@@ -68,10 +81,13 @@ const StorageService = {
   removeUsersReposQuery: function () {
     localStorage.removeItem("UsersReposQuery");
   },
+  removeUserReposQuery: function () {
+    localStorage.removeItem("UserReposQuery");
+  },
+
   removeUsersRepos: function () {
     localStorage.removeItem("UsersRepos");
   },
-
 };
 
 export default StorageService;

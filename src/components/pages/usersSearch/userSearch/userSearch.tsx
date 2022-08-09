@@ -16,28 +16,27 @@ interface ISearchResults {
 
 const SearchResults = ({ results, onResultClick, loading }: ISearchResults) => {
   return (
-    <div>
-      <ul role="list">
-        {results.map((result, index) => (
-          <ResultItem
-            key={index}
-            result={result}
-            onResultClick={onResultClick}
-          />
-        ))}
-      </ul>
-    </div>
+    <ul className={styles.resultsList}>
+      {results.map((result, index) => (
+        <ResultItem key={index} result={result} onResultClick={onResultClick} />
+      ))}
+    </ul>
   );
 };
 
 const UsersSearch = () => {
   const token = process.env.REACT_APP_TOKEN;
-  const initialItems = storage.getUserItems();
   const navigate = useNavigate();
-  const [query, setQuery] = useState("");
   const [initialQuery, setInitialQuery] = useState("");
-  const [APIData, setAPIData] = useState(initialItems);
+  const [APIData, setAPIData] = useState<Item[]>([]);
   // console.log("APIData", APIData);
+
+  useEffect(() => {
+    const initialItems = storage.getUserItems();
+    if (initialItems?.length) {
+      setAPIData(initialItems);
+    }
+  }, []);
 
   async function handleResultsSearch(query: string) {
     const octokit = new Octokit({
@@ -56,7 +55,6 @@ const UsersSearch = () => {
   }
 
   const handleSearch = (input: string) => {
-    setQuery(input);
     setInitialQuery(input);
     if (input) {
       handleResultsSearch(input);
@@ -65,14 +63,11 @@ const UsersSearch = () => {
 
   const handleResultClick = (e: React.MouseEvent<HTMLElement>, id: string) => {
     e.preventDefault();
-    // setInitialQuery("");
-    // setQuery("");
-    // setSearchPerformed(false);
     navigate(`/user/${id}`);
   };
 
   return (
-    <div>
+    <div className={styles.wrapper}>
       <h1>Github Searcher</h1>
       <SearchBar
         initialQuery={initialQuery}

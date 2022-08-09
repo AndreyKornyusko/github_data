@@ -1,0 +1,43 @@
+.wrapper {
+  .resultsList {
+    padding: 0;
+  }
+  .loading {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+  }
+  .content{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 20px;
+    margin-bottom: 15px;
+    .userCard {
+      display: flex;
+      margin-bottom: 20px;
+      .userImgWrap{
+        width: 180px;
+        height: 180px;
+        .userImg{
+          width: 100%;
+          height: auto;
+        }
+      }
+      .userInfoWrap {
+        padding-left: 20px;
+        text-align: left;
+        .userData {
+          span{
+            font-weight: bold;
+          }
+        }
+      }
+    }
+    .userBio {
+      font-size: 14px;
+      text-align: left;
+    }
+  }
+}

@@ -1,0 +1,34 @@
+.listItem {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  list-style: none;
+  padding: 5px;
+  margin-bottom: 10px;
+  
+  .link {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    text-decoration: none;
+    width: 100%;
+    max-width: 600px;
+    color: #000;
+    .name{
+      margin-right: 20px;
+      font-weight: bold;
+      &::first-letter{
+        text-transform: uppercase;
+      }
+    }
+    .textWrap {
+      width: 120px;
+      text-align: left;
+      .text{
+        span{
+          font-weight: bold;
+        }
+      }
+    }
+  }
+}

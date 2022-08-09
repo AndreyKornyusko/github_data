@@ -1,0 +1,32 @@
+.listItem {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  list-style: none;
+  padding-right: 20px;
+  padding-left: 20px;
+  margin-bottom: 10px;
+  cursor: pointer;
+}
+.resultItem {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  max-width: 1000px;
+  padding: 5px;
+  .userAvatar {
+    width: 40px;
+    height: 40px;
+  }
+  .userName {
+    font-size: 20px;
+    margin-right: 20px;
+    margin-left: 20px;
+  }
+  .userRepo {
+    span{
+      font-weight: bold;
+    }
+  }
+}

@@ -1,5 +1,5 @@
-import React, {useState, useEffect} from 'react'
-
+import {useState, useEffect} from 'react'
+import styles from './searchBar.module.scss'
 interface ISerchBar {
   onSearch: (input: string) => void;
   initialQuery: string;
@@ -20,10 +20,8 @@ const SearchBar = ({ onSearch, initialQuery, placeholder }: ISerchBar) => {
   }, [initialQuery]);
 
   return (
-    <>
-      <div>
-        <div></div>
-        <input
+      <div className={styles.searchBar}>
+        <input className={styles.searchBarInput}
           name="search_field"
           autoComplete="off"
           placeholder={placeholder}
@@ -32,7 +30,7 @@ const SearchBar = ({ onSearch, initialQuery, placeholder }: ISerchBar) => {
           type="text"
         />
       </div>
-    </>
+   
   );
 };
 

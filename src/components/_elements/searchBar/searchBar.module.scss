@@ -1,0 +1,16 @@
+.searchBar {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-bottom: 20px;
+  .searchBarInput {
+    width: 400px;
+    height: 30px;
+    padding: 5px;
+    padding-left: 20px;
+    font-size: 18px;
+    &::placeholder {
+      font-size: 18px;
+    }
+  }
+}
