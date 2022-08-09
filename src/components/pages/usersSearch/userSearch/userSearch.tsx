@@ -29,7 +29,6 @@ const UsersSearch = () => {
   const navigate = useNavigate();
   const [initialQuery, setInitialQuery] = useState("");
   const [APIData, setAPIData] = useState<Item[]>([]);
-  // console.log("APIData", APIData);
 
   useEffect(() => {
     const initialItems = storage.getUserItems();

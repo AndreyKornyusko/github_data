@@ -12,21 +12,24 @@ const ResultItem = ({ result, onResultClick }: IResultItem) => {
   const token = process.env.REACT_APP_TOKEN
 
   const [userData, setUserData] = useState<UserData|null>(null);
-  // console.log("userData", userData)
   useEffect(() => {
-    async function handleSearch(id: string) {
+    async function getUser(id: string) {
       const octokit = new Octokit({
         // auth: token,
       });
 
-      const data = await octokit.request(`GET /users/${id}`, {
-        username: id,
-      });
-      setUserData(data.data);
+      try {
+        const data = await octokit.request(`GET /users/${id}`, {
+          username: id,
+        });
+        setUserData(data.data);
+      } catch (err) {
+        console.log(err);
+      }
     }
 
     if (result?.login) {
-      handleSearch(result.login);
+      getUser(result.login);
     }
   }, []);
 

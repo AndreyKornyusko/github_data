@@ -20,7 +20,9 @@ const SearchResults = ({ results }: ISearchResults) => {
   );
 };
 const UserInfo = () => {
-
+  const initialUserData = storage.getUserData();
+  const initialUserRepos = storage.getUsersRepos();
+  const cashedQuery = storage.getUserReposQuery();
   const { id } = useParams();
   const [isUserLoading, setIsUserLoading] = useState(true);
   const [isReposLoading, setIsReposLoading] = useState(true);
@@ -30,9 +32,6 @@ const UserInfo = () => {
   const [query, setQuery] = useState("");
   const [initialQuery, setInitialQuery] = useState("");
   const [filteredRepos, setFilteredRepos] = useState<UserRepo[]>([]);
-  // console.log("userData", userData);
-  // console.log("userRepos", userRepos);
-  // console.log("filteredRepos", filteredRepos);
   const token = process.env.REACT_APP_TOKEN;
 
   useEffect(() => {
@@ -46,21 +45,11 @@ const UserInfo = () => {
   }, [userData]);
 
   useEffect(() => {
-    const initialUserData = storage.getUserData();
-    const initialUserRepos = storage.getUsersRepos();
-    const cashedQuery = storage.getUserReposQuery();
-
-    if(initialUserData){
-      setUserData(initialUserData)
-    }
-    if(initialUserRepos?.length){
-      setFilteredRepos(initialUserRepos)
-    }
-    if(cashedQuery){
+    if(cashedQuery&&initialUserData?.login===id){
       setQuery(cashedQuery)
       setInitialQuery(cashedQuery)
     }
-  }, []);
+  }, [isReposLoading]);
 
   useEffect(() => {
     async function getUser() {
@@ -81,8 +70,11 @@ const UserInfo = () => {
         setIsUserLoading(false);
       }
     }
-    if (id) {
+    if (id && initialUserData?.login!==id) {
       getUser();
+    } else {
+      setUserData(initialUserData)
+      setIsUserLoading(false);
     }
   }, [id]);
 
@@ -106,8 +98,12 @@ const UserInfo = () => {
         setIsReposLoading(false);
       }
     }
-    if (id) {
+    if (id && initialUserData?.login!==id) {
       handleReposSearch();
+    } else {
+      setUserRepos(initialUserRepos)
+      setIsReposLoading(false);
+
     }
   }, [id]);
 
@@ -132,7 +128,6 @@ const UserInfo = () => {
 
   const handleSearch = (searchValue: string) => {
     setQuery(searchValue);
-    setInitialQuery(searchValue);
     storage.setUserReposQuery(searchValue);
   };
 
