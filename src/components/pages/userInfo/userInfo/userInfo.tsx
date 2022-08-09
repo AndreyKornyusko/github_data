@@ -31,7 +31,6 @@ const UserInfo = () => {
   const [userRepos, setUserRepos] = useState<UserRepo[]>([]);
   const [query, setQuery] = useState("");
   const [initialQuery, setInitialQuery] = useState("");
-  const [filteredRepos, setFilteredRepos] = useState<UserRepo[]>([]);
   const token = process.env.REACT_APP_TOKEN;
 
   useEffect(() => {
@@ -122,7 +121,7 @@ const UserInfo = () => {
           .toLowerCase()
           .includes(searchValue.toLowerCase());
       });
-      setFilteredRepos(filteredData);
+      setUserRepos(filteredData);
     }
   };
 
@@ -159,8 +158,8 @@ const UserInfo = () => {
         onSearch={(e) => handleSearch(e)}
         placeholder="Search for user`s repositories"
       />
-      {filteredRepos?.length && !isReposLoading ? (
-        <SearchResults results={filteredRepos} />
+      {userRepos?.length && !isReposLoading ? (
+        <SearchResults results={userRepos} />
       ) : null}
     </div>
   );
